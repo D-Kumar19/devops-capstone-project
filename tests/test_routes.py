@@ -183,3 +183,26 @@ class TestAccountService(TestCase):
             content_type="application/json"
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_list_all_accounts(self):
+        """It should return an empty list when no accounts are created"""
+        response = self.client.get(BASE_URL)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.get_json()), 0)
+        data = response.get_json()
+        self.assertEqual(data, [])
+
+    def test_list_all_accounts_with_data(self):
+        """It should return a list of all accounts"""
+        self._create_accounts(5)
+        response = self.client.get(BASE_URL)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), 5)
+        for account in data:
+            self.assertIn("id", account)
+            self.assertIn("name", account)
+            self.assertIn("email", account)
+            self.assertIn("address", account)
+            self.assertIn("phone_number", account)
+            self.assertIn("date_joined", account)
