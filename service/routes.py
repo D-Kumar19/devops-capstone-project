@@ -71,7 +71,7 @@ def create_accounts():
 @app.route("/accounts/<int:account_id>", methods=["GET"])
 def read_account(account_id: int):
     """
-    Reads and account with provided account id
+    Reads an account with provided account id
     """
     app.logger.info("Request to read an account")
     account = Account.find(account_id)
@@ -91,7 +91,27 @@ def read_account(account_id: int):
 # UPDATE AN EXISTING ACCOUNT
 ######################################################################
 
-# ... place you code here to UPDATE an account ...
+@app.route("/accounts/<int:account_id>", methods=["PUT"])
+def update_account(account_id: int):
+    """
+    Updates an account with provided account id
+    """
+    app.logger.info("Request to update an account")
+    check_content_type("application/json")
+    account = Account.find(account_id)
+
+    if account is None:
+        app.logger.info("Account not found with {account_id} ID")
+        response_status = status.HTTP_404_NOT_FOUND
+        message = f"Status Code: {response_status}"
+    else:
+        app.logger.info("Account found with {account_id} ID")
+        account.deserialize(request.get_json())
+        account.update()
+        message = account.serialize()
+        response_status = status.HTTP_200_OK
+
+    return jsonify(message), response_status
 
 
 ######################################################################
